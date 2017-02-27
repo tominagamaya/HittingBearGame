@@ -1,0 +1,149 @@
+<!doctype html>
+<html><head><script src="js/enchant.js"></script></head>
+<body style="margin:0; padding: 0;">
+<script>
+enchant(); // initialize
+window.addEventListener( 'load', function(){
+
+    var game = new Core(320, 320); // game stage
+    var chara1 = 'http://enchantjs.com/assets/images/space3.gif';
+    var start = 'http://enchantjs.com/assets/images/start.png';
+    var effect0 = 'http://enchantjs.com/images/materials/effect0.png';
+    var over = 'http://enchantjs.com/images/materials/gameover.png';
+    var clear = 'http://enchantjs.com/assets/images/clear.png';
+    game.preload([chara1, start, effect0, over, clear]);
+    game.fps = 20;
+
+    game.onload = function(){
+      var num = 0;
+      var bangNum = 0;
+      var interval = 1000;
+      var tensu = 0;
+      var time = 31;
+
+      //スコア表示
+      var score = new Label();
+      score.text = 'SCORE: ' + tensu;
+      score.x = 10;
+      score.y = 10;
+      game.rootScene.addChild(score);
+
+      //残り時間表示
+      var timeLabel = new Label();
+      timeLabel.text = 'TIME: ' + time;
+      timeLabel.x = 230;
+      timeLabel.y = 10;
+      game.rootScene.addChild(timeLabel);
+
+      //スタート画面
+      var gameStart = new Sprite(236, 48);
+      gameStart.image = game.assets[start];
+      gameStart.x = 42;
+      gameStart.y = 136;
+      var gameStartScene = new Scene();
+      gameStartScene.addChild(gameStart);
+
+      gameStart.addEventListener('touchstart', function(){
+        game.popScene();
+
+        (function(){
+          time -= 1;
+          timeLabel.text = 'TIME: ' + time;
+
+          //画面にクマが5匹以上出てきたらゲームオーバー
+          if(num - bangNum >= 5){
+            // ゲームオーバー
+            var gameOver = new Sprite(189, 97);
+            gameOverScene = new Scene();
+            gameOver.image = game.assets[over];
+            gameOver.x = 65;
+            gameOver.y = 111;
+            gameOverScene.addChild(gameOver);
+            game.pushScene(gameOverScene);
+            return;
+          }
+
+          //男の子か女の子クマをランダムで作成
+          var bear = createBear();
+
+          //クマがタッチされたときの処理
+          bear.addEventListener('touchstart', function(){
+            if(this.girl == false){
+              tensu += 10;
+            }else{
+              tensu += 50;
+            }
+            score.text = 'SCORE:' + tensu;
+
+            //爆発オブジェクトを作成
+            createBang(this);
+            bangNum++;
+
+          }, false);
+          num++;
+
+          if(time > 0){
+            setTimeout(arguments.callee, interval);
+          }else{
+            //ゲームクリア
+            var gameClear = new Sprite(267, 48);
+            gameClearScene = new Scene();
+            gameClear.image = game.assets[clear];
+            gameClear.x = 26;
+            gameClear.y = 136;
+            gameClearScene.addChild(gameClear);
+            game.pushScene(gameClearScene);
+            return;
+          }
+          bear.addEventListener('enterframe', function(){
+            if(bear.x < 350){
+              this.x += 2;
+            }else{
+              this.parentNode.removeChild(this);
+            }
+          });
+        })();
+      }, false);
+
+      game.pushScene(gameStartScene);
+    };
+    game.start(); // start your game!
+
+    function createBear(){
+      var bear = new Sprite(32, 32);
+      bear.image = game.assets[chara1];
+
+      bear.x = Math.floor(Math.random() * 280);
+      bear.y = Math.floor(Math.random() * 280);
+
+      game.rootScene.addChild(bear);
+
+      if(Math.floor(Math.random() * 5) == 1){
+        bear.frame = [11, 11, 12, 12];
+        bear.girl = true;
+
+      }else{
+        bear.frame = [1, 1, 2, 2];
+        bear.girl = false;
+      }
+      return bear;
+    }
+
+    function createBang(bear){
+      var bang = new Sprite(16, 16);
+      bang.image = game.assets[effect0];
+      bang.x = bear.x;
+      bang.y = bear.y;
+      game.rootScene.addChild(bang);
+      bang.frame = [0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4];
+      bear.parentNode.removeChild(bear);
+      var bangTmp = bang;
+      setTimeout(function(){
+        //消す
+        bangTmp.parentNode.removeChild(bangTmp);
+      }, 2000);
+    }
+}, false);
+</script>
+</body>
+</html>
