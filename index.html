@@ -22,17 +22,11 @@ window.addEventListener( 'load', function(){
       var time = 31;
 
       //スコア表示
-      var score = new Label();
-      score.text = 'SCORE: ' + tensu;
-      score.x = 10;
-      score.y = 10;
+      var score = referScore(tensu);
       game.rootScene.addChild(score);
 
       //残り時間表示
-      var timeLabel = new Label();
-      timeLabel.text = 'TIME: ' + time;
-      timeLabel.x = 230;
-      timeLabel.y = 10;
+      var timeLabel = referTime(time);
       game.rootScene.addChild(timeLabel);
 
       //スタート画面
@@ -108,6 +102,22 @@ window.addEventListener( 'load', function(){
       game.pushScene(gameStartScene);
     };
     game.start(); // start your game!
+
+    function referScore(tensu){
+      var score = new Label();
+      score.text = 'SCORE: ' + tensu;
+      score.x = 10;
+      score.y = 10;
+      return score;
+    }
+
+    function referTime(time){
+      var timeLabel = new Label();
+      timeLabel.text = 'TIME: ' + time;
+      timeLabel.x = 230;
+      timeLabel.y = 10;
+      return timeLabel;
+    }
 
     function createBear(){
       var bear = new Sprite(32, 32);
