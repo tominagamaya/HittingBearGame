@@ -19,21 +19,18 @@ window.addEventListener( 'load', function(){
       var bangNum = 0;
       var interval = 1000;
       var tensu = 0;
-      var time = 31;
+      var time = 11;
 
       //スコア表示
-      var score = referScore(tensu);
+      var score = new Score(tensu);;
       game.rootScene.addChild(score);
 
       //残り時間表示
-      var timeLabel = referTime(time);
+      var timeLabel = new RemainingTime(time);
       game.rootScene.addChild(timeLabel);
 
       //スタート画面
-      var gameStart = new Sprite(236, 48);
-      gameStart.image = game.assets[start];
-      gameStart.x = 42;
-      gameStart.y = 136;
+      var gameStart = new GameStart();
       var gameStartScene = new Scene();
       gameStartScene.addChild(gameStart);
 
@@ -47,11 +44,8 @@ window.addEventListener( 'load', function(){
           //画面にクマが5匹以上出てきたらゲームオーバー
           if(num - bangNum >= 5){
             // ゲームオーバー
-            var gameOver = new Sprite(189, 97);
+            var gameOver = new GameOver();
             gameOverScene = new Scene();
-            gameOver.image = game.assets[over];
-            gameOver.x = 65;
-            gameOver.y = 111;
             gameOverScene.addChild(gameOver);
             game.pushScene(gameOverScene);
             return;
@@ -80,11 +74,8 @@ window.addEventListener( 'load', function(){
             setTimeout(arguments.callee, interval);
           }else{
             //ゲームクリア
-            var gameClear = new Sprite(267, 48);
+            var gameClear = new GameClear();
             gameClearScene = new Scene();
-            gameClear.image = game.assets[clear];
-            gameClear.x = 26;
-            gameClear.y = 136;
             gameClearScene.addChild(gameClear);
             game.pushScene(gameClearScene);
             return;
@@ -102,22 +93,6 @@ window.addEventListener( 'load', function(){
       game.pushScene(gameStartScene);
     };
     game.start(); // start your game!
-
-    function referScore(tensu){
-      var score = new Label();
-      score.text = 'SCORE: ' + tensu;
-      score.x = 10;
-      score.y = 10;
-      return score;
-    }
-
-    function referTime(time){
-      var timeLabel = new Label();
-      timeLabel.text = 'TIME: ' + time;
-      timeLabel.x = 230;
-      timeLabel.y = 10;
-      return timeLabel;
-    }
 
     function createBear(){
       var bear = new Sprite(32, 32);
@@ -153,6 +128,50 @@ window.addEventListener( 'load', function(){
         bangTmp.parentNode.removeChild(bangTmp);
       }, 2000);
     }
+    var Score = enchant.Class.create(enchant.Label, {
+      initialize: function(tensu){
+        enchant.Label.call(this);
+        this.text = 'SCORE: ' + tensu;
+        this.x = 10;
+        this.y = 10;
+      }
+    });
+
+    var RemainingTime = enchant.Class.create(enchant.Label, {
+      initialize: function(time){
+        enchant.Label.call(this);
+        this.text = 'TIME: ' + time;
+        this.x = 230;
+        this.y = 10;
+      }
+    });
+
+    var GameStart = enchant.Class.create(enchant.Sprite, {
+      initialize: function(){
+        enchant.Sprite.call(this, 236, 48);
+        this.image = game.assets[start];
+        this.x = 42;
+        this.y = 136;
+      }
+    });
+
+    var GameOver = enchant.Class.create(enchant.Sprite, {
+      initialize: function(){
+        enchant.Sprite.call(this, 189, 97);
+        this.image = game.assets[over];
+        this.x = 65;
+        this.y = 111;
+      }
+    });
+
+    var GameClear = enchant.Class.create(enchant.Sprite, {
+      initialize: function(){
+        enchant.Sprite.call(this, 267, 48);
+        this.image = game.assets[clear];
+        this.x = 26;
+        this.y = 136;
+      }
+    });
 }, false);
 </script>
 </body>
