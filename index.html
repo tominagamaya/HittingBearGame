@@ -24,6 +24,12 @@ window.addEventListener( 'load', function(){
     var secondScene;
     var secondScore = 0;
 
+    var NORMAL = 0;
+    var GIRL = 1;
+    var WHITE = 2;
+    var CRY = 3;
+    var SHOOT = 4;
+
     //スコア表示
     var score = new Score(tensu);
     game.rootScene.addChild(score);
@@ -201,20 +207,17 @@ window.addEventListener( 'load', function(){
         this.image = game.assets[chara1];
         this.x = Math.floor(Math.random() * 280);
         this.y = Math.floor(Math.random() * 280);
-        this.girl = false;
-        this.white = false;
-        this.cry = false;
-        this.shoot = false;
+        this.status = NORMAL;
 
         //女の子クマ
         if(Math.floor(Math.random() * 5) == 1){
           this.frame = [11, 11, 12, 12];
-          this.girl = true;
+          this.status = GIRL;
 
         //白クマ
         }else if(Math.floor(Math.random() * 5) == 1){
             this.frame = [6, 6, 7, 7];
-            this.white = true;
+            this.status = WHITE;
 
         //ノーマルクマ
         }else{
@@ -222,34 +225,34 @@ window.addEventListener( 'load', function(){
         }
       },
       onenterframe: function(){
-        if(this.shoot == true){
+        if(this.status == SHOOT){
           this.rotate(45);
           this.y -= 8;
-        }else if(this.cry == false && this.x < 350){
+        }else if(this.status != CRY && this.x < 350){
           this.x += 4;
 
-        }else if(this.cry == false){
+        }else if(this.status != CRY){
           this.parentNode.removeChild(this);
         }
       },
       ontouchstart: function(){
-        if(this.girl == true){
+        if(this.status == GIRL){
           tensu += 50;
 
-        }else if(this.cry == true){
-          this.shoot = true;
+        }else if(this.status == CRY){
+          this.status = SHOOT;
           tensu += 100;
 
-        }else if(this.white == true){
+        }else if(this.status == WHITE){
           this.frame = [8];
-          this.cry = true;
+          this.status = CRY;
 
         }else{
           tensu += 10;
         }
         secondScore.text = 'SCORE:' + tensu;
 
-        if(this.white == false){
+        if(this.status == GIRL || this.status == NORMAL){
           //爆発オブジェクトを作成
           var bang = new Bang(this);
           secondScene.addChild(bang);
