@@ -189,7 +189,7 @@ window.addEventListener( 'load', function(){
         var bangTmp = bang;
         setTimeout(function(){
           //消す
-          bangTmp.parentNode.removeChild(bangTmp);
+          if(bangTmp.parentNode) bangTmp.parentNode.removeChild(bangTmp);
         }, 2000);
         bangNum++;
       }
