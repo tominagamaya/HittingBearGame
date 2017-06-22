@@ -5,144 +5,345 @@
 enchant(); // initialize
 window.addEventListener( 'load', function(){
 
-    var game = new Core(320, 320); // game stage
-    var chara1 = 'http://enchantjs.com/assets/images/space3.gif';
-    var start = 'http://enchantjs.com/assets/images/start.png';
-    var effect0 = 'http://enchantjs.com/images/materials/effect0.png';
-    var over = 'http://enchantjs.com/images/materials/gameover.png';
-    var clear = 'http://enchantjs.com/assets/images/clear.png';
-    game.preload([chara1, start, effect0, over, clear]);
-    game.fps = 20;
+  var game = new Core(320, 320); // game stage
+  var chara1 = 'http://enchantjs.com/assets/images/space3.gif';
+  var start = 'http://enchantjs.com/assets/images/start.png';
+  var effect0 = 'http://enchantjs.com/images/materials/effect0.png';
+  var over = 'http://enchantjs.com/images/materials/gameover.png';
+  var crear = 'http://enchantjs.com/assets/images/clear.png';
+  game.preload([chara1, start, effect0, over, clear]);
+  game.fps = 20;
 
-    game.onload = function(){
-      var num = 0;
-      var bangNum = 0;
-      var interval = 1000;
-      var tensu = 0;
-      var time = 31;
+  game.onload = function(){
+    var num = 0;
+    var bangNum = 0;
+    var interval = 1000;
+    var interval2 = 500;
+    var tensu = 0;
+    var time = 11;
+    var secondScene;
+    var secondScore = 0;
 
-      //スコア表示
-      var score = new Label();
-      score.text = 'SCORE: ' + tensu;
-      score.x = 10;
-      score.y = 10;
-      game.rootScene.addChild(score);
+    var NORMAL = 0;
+    var GIRL = 1;
+    var WHYTE = 2;
+    var CRY = 3;
+    var SHOOT = 4;
 
-      //残り時間表示
-      var timeLabel = new Label();
-      timeLabel.text = 'TIME: ' + time;
-      timeLabel.x = 230;
-      timeLabel.y = 10;
-      game.rootScene.addChild(timeLabel);
+    //スコア表示
+    var score = new Score(tensu);
+    game.rootScene.addChild(score);
 
-      //スタート画面
-      var gameStart = new Sprite(236, 48);
-      gameStart.image = game.assets[start];
-      gameStart.x = 42;
-      gameStart.y = 136;
-      var gameStartScene = new Scene();
-      gameStartScene.addChild(gameStart);
+    //残り時間表示
+    var timeLabel = new RemainingTime(time);
+    game.rootScene.addChild(timeLabel);
 
-      gameStart.addEventListener('touchstart', function(){
-        game.popScene();
+    //スタート画面
+    var gameStart = new GameStart();
+    var gameStartScene = new Scene();
+    gameStartScene.addChild(gameStart);
+    var startMesage = new Message1();
+    game.rootScene.addChild(startMessage);
 
-        (function(){
-          time -= 1;
-          timeLabel.text = 'TIME: ' + time;
+    gameStart.addEventListener('touchstart', function(){
+      game.rootScene.removeChild(startMessage);
+      game.popScene();
 
-          //画面にクマが5匹以上出てきたらゲームオーバー
-          if(num - bangNum >= 5){
-            // ゲームオーバー
-            var gameOver = new Sprite(189, 97);
-            gameOverScene = new Scene();
-            gameOver.image = game.assets[over];
-            gameOver.x = 65;
-            gameOver.y = 111;
-            gameOverScene.addChild(gameOver);
-            game.pushScene(gameOverScene);
-            return;
-          }
+      (function(){
+        time -= 1;
+        timeLabel.text = 'TIME: ' + time;
 
-          //男の子か女の子クマをランダムで作成
-          var bear = createBear();
+        //クマを5匹以上逃したらゲームオーバー
+        if(num - bangNum >= 5){
+          // ゲームオーバー画面
+          var gameOver = new GameOver();
+          gameOverScene = new Scene();
+          gameOverScene.addChild(gameOver);
+          game.pushScene(gameOverScene);
+          return;
+        }
 
-          //クマがタッチされたときの処理
-          bear.addEventListener('touchstart', function(){
-            if(this.girl == false){
-              tensu += 10;
-            }else{
-              tensu += 50;
+        //男の子か女の子クマをランダムで作成
+        var bear = new Bear();
+        game.rootScene.addChild(bear);
+        num++;
+
+        if(time > 0){
+          setTimeout(arguments.callee, interval);
+        }else{
+          //ゲームクリア
+          var gameClear = new GameClear();
+          gameClearScene = new Scene();
+          gameClearScene.addChild(gameClear);
+          game.pushScene(gameClearScene);
+
+          //2ndステージ
+          gameClear.addEventListener('touchstart', function(){
+            //1stステージのオブジェクトを削除
+            while(game.rootScene.childNodes.length > 0){
+              game.rootScene.removeChild(game.rootScene.childNodes[0]);
             }
-            score.text = 'SCORE:' + tensu;
 
-            //爆発オブジェクトを作成
-            createBang(this);
-            bangNum++;
+            //START画面を表示
+            var gameStart = new GameStart();
+            var gameStartScene = new Scene();
+            gameStartScene.addChild(gameStart);
+            var startMessage2 = new Message2();
+            gameStartScene.addChild(startMessage2);
 
-          }, false);
-          num++;
+            game.replaceScene(gameStartScene);
 
-          if(time > 0){
-            setTimeout(arguments.callee, interval);
-          }else{
-            //ゲームクリア
-            var gameClear = new Sprite(267, 48);
-            gameClearScene = new Scene();
-            gameClear.image = game.assets[clear];
-            gameClear.x = 26;
-            gameClear.y = 136;
-            gameClearScene.addChild(gameClear);
-            game.pushScene(gameClearScene);
-            return;
-          }
-          bear.addEventListener('enterframe', function(){
-            if(bear.x < 350){
-              this.x += 2;
-            }else{
-              this.parentNode.removeChild(this);
-            }
+            //2ndステージSTART
+            gameStart.addEventListener('touchstart', function(){
+              gameStartScene.removeChild(startMessage2);
+              var num = 0;
+              var bangNum = 0;
+
+              game.popScene();
+              secondScene = new Scene();
+
+              //スコア表示
+              tensu = 0;
+              secondScore = new Score(tensu);
+              secondScene.addChild(secondScore);
+
+              //残り時間表示
+              time = 31;
+              var timeLabel = new RemainingTime(time);
+              secondScene.addChild(timeLabel);
+
+              if(game.rootScene.childNodes.length > 0){
+                game.rootScene.removeChild(game.rootScene.childNodes[0]);
+              }
+              (function(){
+                time -= 1;
+                timeLabel.text = 'TIME: ' + time;
+
+                //クマを30匹以上逃したらゲームオーバー
+                if(num - bangNum >= 30){
+                  // ゲームオーバー
+                  var gameOver = new GameOver();
+                  gameOverScene = new Scene();
+                  gameOverScene.addChild(gameOver);
+                  game.pushScene(gameOverScene);
+                  return;
+                }
+
+                //男の子か女の子クマをランダムで作成
+                var bear2 = new Bear2();
+                secondScene.addChild(bear2);
+                num++;
+
+                if(time > 0){
+                  setTimeout(arguments.callee, interval2);
+                }else{
+                  //ゲームクリア
+                  var gameClear = new GameClear();
+                  gameClearScene = new Scene();
+                  gameClearScene.addChild(gameClear);
+                  game.pushScene(gameClearScene);
+
+                  return;
+                }
+              })();
+              game.replaceScene(secondScene);
+
+            }, false);
           });
-        })();
-      }, false);
+          return;
+        }
+      })();
+    }, false);
 
-      game.pushScene(gameStartScene);
-    };
-    game.start(); // start your game!
+    game.pushScene(gameStartScene);
 
-    function createBear(){
-      var bear = new Sprite(32, 32);
-      bear.image = game.assets[chara1];
+    var Bear = enchant.Class.create(enchant.Sprite, {
+      initialize: function(){
+        enchant.Sprite.call(this, 32, 32);
+        this.image = game.assets[chara1];
+        this.x = Math.floor(Math.random() * 280);
+        this.y = Math.floor(Math.random() * 280);
 
-      bear.x = Math.floor(Math.random() * 280);
-      bear.y = Math.floor(Math.random() * 280);
+        if(Math.floor(Math.random() * 5) == 1){
+          this.frame = [11, 11, 12, 12];
+          this.girl = true;
 
-      game.rootScene.addChild(bear);
+        }else{
+          this.frame = [1, 1, 2, 2];
+          this.girl = false;
+        }
+      },
+      onenterframe: function(){
+        if(this.x < 350){
+          this.x += 2;
+        }else{
+          this.parentNode.removeChild(this);
+        }
+      },
+      ontouchstart: function(){
+        if(this.girl == false){
+          tensu += 10;
+        }else{
+          tensu += 50;
+        }
+        score.text = 'SCORE:' + tensu;
 
-      if(Math.floor(Math.random() * 5) == 1){
-        bear.frame = [11, 11, 12, 12];
-        bear.girl = true;
+        //爆発オブジェクトを作成
+        var bang = new Bang(this);
+        game.rootScene.addChild(bang);
 
-      }else{
-        bear.frame = [1, 1, 2, 2];
-        bear.girl = false;
+        var bangTmp = bang;
+        setTimeout(function(){
+          //消す
+          if(bangTmp.parentNode) bangTmp.parentNode.removeChild(bangTmp);
+        }, 2000);
+        bangNum++;
       }
-      return bear;
-    }
+    });
 
-    function createBang(bear){
-      var bang = new Sprite(16, 16);
-      bang.image = game.assets[effect0];
-      bang.x = bear.x;
-      bang.y = bear.y;
-      game.rootScene.addChild(bang);
-      bang.frame = [0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4];
+    var Bear2 = enchant.Class.create(enchant.Sprite, {
+      initialize: function(){
+        enchant.Sprite.call(this, 32, 32);
+        this.image = game.assets[chara1];
+        this.x = Math.floor(Math.random() * 280);
+        this.y = Math.floor(Math.random() * 280);
+        this.status = NORMAL;
+
+        //女の子クマ
+        if(Math.floor(Math.random() * 5) == 1){
+          this.frame = [11, 11, 12, 12];
+          this.status = GIRL;
+
+        //白クマ
+        }else if(Math.floor(Math.random() * 5) == 1){
+            this.frame = [6, 6, 7, 7];
+            this.status = WHITE;
+
+        //ノーマルクマ
+        }else{
+          this.frame = [1, 1, 2, 2];
+        }
+      },
+      onenterframe: function(){
+        if(this.status == SHOOT){
+          this.rotate(45);
+          this.y -= 8;
+        }else if(this.status != CRY && this.x < 350){
+          this.x += 4;
+
+        }else if(this.status != CRY){
+          this.parentNode.removeChild(this);
+        }
+      },
+      ontouchstart: function(){
+        if(this.status == GIRL){
+          tensu += 50;
+
+        }else if(this.status == CRY){
+          this.status = SHOOT;
+          tensu += 100;
+
+        }else if(this.status == WHITE){
+          this.frame = [8];
+          this.status = CRY;
+
+        }else{
+          tensu += 10;
+        }
+        secondScore.text = 'SCORE:' + tensu;
+
+        if(this.status == GIRL || this.status == NORMAL){
+          //爆発オブジェクトを作成
+          var bang = new Bang(this);
+          secondScene.addChild(bang);
+
+          var bangTmp = bang;
+          setTimeout(function(){
+            //消す
+            bangTmp.parentNode.removeChild(bangTmp);
+          }, 2000);
+          bangNum++;
+        }
+      }
+    });
+  };
+  game.start(); // start your game!
+
+  var Bang = enchant.Class.create(enchant.Sprite, {
+    initialize: function(bear){
+      enchant.Sprite.call(this, 16, 16);
+      this.image = game.assets[effect0];
+      this.x = bear.x;
+      this.y = bear.y;
+      this.frame = [0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4];
       bear.parentNode.removeChild(bear);
-      var bangTmp = bang;
-      setTimeout(function(){
-        //消す
-        bangTmp.parentNode.removeChild(bangTmp);
-      }, 2000);
     }
+  });
+
+  var Score = enchant.Class.create(enchant.Label, {
+    initialize: function(tensu){
+      enchant.Label.call(this);
+      this.text = 'SCORE: ' + tensu;
+      this.x = 10;
+      this.y = 10;
+    }
+  });
+
+  var RemainingTime = enchant.Class.create(enchant.Label, {
+    initialize: function(time){
+      enchant.Label.call(this);
+      this.text = 'TIME: ' + time;
+      this.x = 230;
+      this.y = 10;
+    }
+  });
+
+  var Message1 = enchant.Class.create(enchant.Label, {
+    initialize: function(){
+      enchant.Label.call(this);
+      this.text = '1st STAGE：ひたすらクマを叩け！';
+      this.font = "16px 'Consolas', 'Monaco', 'ＭＳ ゴシック'";
+      this.x = 40;
+      this.y = 100;
+    }
+  })
+
+  var Message2 = enchant.Class.create(enchant.Label, {
+    initialize: function(){
+      enchant.Label.call(this);
+      this.text = '2nd STAGE：白いクマを吹っ飛ばせ！';
+      this.font = "16px 'Consolas', 'Monaco', 'ＭＳ ゴシック'";
+      this.x = 40;
+      this.y = 100;
+    }
+  })
+
+  var GameStart = enchant.Class.create(enchant.Sprite, {
+    initialize: function(){
+      enchant.Sprite.call(this, 236, 48);
+      this.image = game.assets[start];
+      this.x = 42;
+      this.y = 136;
+    }
+  });
+
+  var GameOver = enchant.Class.create(enchant.Sprite, {
+    initialize: function(){
+      enchant.Sprite.call(this, 189, 97);
+      this.image = game.assets[over];
+      this.x = 65;
+      this.y = 111;
+    }
+  });
+
+  var GameClear = enchant.Class.create(enchant.Sprite, {
+    initialize: function(){
+      enchant.Sprite.call(this, 267, 48);
+      this.image = game.assets[clear];
+      this.x = 26;
+      this.y = 136;
+    }
+  });
 }, false);
 </script>
 </body>
