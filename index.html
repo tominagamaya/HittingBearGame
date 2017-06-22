@@ -10,7 +10,7 @@ window.addEventListener( 'load', function(){
   var start = 'http://enchantjs.com/assets/images/start.png';
   var effect0 = 'http://enchantjs.com/images/materials/effect0.png';
   var over = 'http://enchantjs.com/images/materials/gameover.png';
-  var clear = 'http://enchantjs.com/assets/images/clear.png';
+  var crear = 'http://enchantjs.com/assets/images/clear.png';
   game.preload([chara1, start, effect0, over, clear]);
   game.fps = 20;
 
@@ -26,7 +26,7 @@ window.addEventListener( 'load', function(){
 
     var NORMAL = 0;
     var GIRL = 1;
-    var WHITE = 2;
+    var WHYTE = 2;
     var CRY = 3;
     var SHOOT = 4;
 
@@ -42,7 +42,7 @@ window.addEventListener( 'load', function(){
     var gameStart = new GameStart();
     var gameStartScene = new Scene();
     gameStartScene.addChild(gameStart);
-    var startMessage = new Message1();
+    var startMesage = new Message1();
     game.rootScene.addChild(startMessage);
 
     gameStart.addEventListener('touchstart', function(){
